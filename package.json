@@ -11,7 +11,6 @@
   "author": "",
   "license": "AGPL-3.0",
   "dependencies": {
-    "@svgdotjs/svg.js": "^3.1.2",
     "node-fetch": "^3.3.1",
     "node-html-parser": "^6.1.5"
   }

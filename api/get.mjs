@@ -9,10 +9,13 @@ export default async (request, response) => {
     /**
      * @type {String} JSON or SVG
      */
-    const Type = GetQueryString(Search, "type").toUpperCase()
+    const Type = GetQueryString(Search, "type").toUpperCase(),
+          UserName = GetQueryString(Search, "username");
 
-    const UserName = GetQueryString(Search, "username");
-    let ContributionData = await GenContributionData(UserName, Type);
+    let ContributionData = 
+        (Type === "JSON" || Type === "SVG")
+            ? await GenContributionData(UserName, Type)
+            : "? what do you mean";
     
     response.send(ContributionData);
 }
@@ -21,7 +24,4 @@ function GetQueryString (search, name) {
     var r = search.match(reg);
 
     return !!r ? r[2] : 0 ;
-    // 如果 r {Array} 爲 Truly 就返回 r[2]
 }
-
-//let ContributionsData = fetch();

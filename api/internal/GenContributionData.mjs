@@ -8,7 +8,7 @@ export async function GenContributionData (UserName, Type) {
     let SVG = await FetchUserData(UserName);
     return Type === "JSON"
                 ? JSON.stringify(GenContributionObject(SVG, UserName))
-                : Type === "SVG" ? SVG.toString() : "? what do you mean"
+                : SVG.toString();
 }
 
 /**
@@ -17,7 +17,61 @@ export async function GenContributionData (UserName, Type) {
  */
 async function FetchUserData (UserName) {
     let RawData = await fetch(`https://github.com/${UserName}`).then(res => res.text());
-    return HTMLParser.parse(RawData).querySelector(".js-calendar-graph-svg");
+    let RawSVG = HTMLParser.parse(RawData).querySelector(".js-calendar-graph-svg");
+    RawSVG.removeAttribute("class");
+    RawSVG.setAttribute("height", "142")
+    RawSVG.querySelector("g").removeAttribute("data-hydro-click");
+    RawSVG.querySelector("g").removeAttribute("data-hydro-click-hmac");
+    RawSVG.querySelector("g").setAttribute("transform", "translate(15, 50)");
+
+    // <text class="title" dx="0" dy="16">One's GitHub Contributions Summary</text>
+    let Rects = RawSVG.querySelectorAll("rect[class=\"ContributionCalendar-day\"]");
+    for (let i=0; i<Rects.length; i++) {
+        Rects[i].removeAttribute("class");
+    }
+
+    let Texts = RawSVG.querySelectorAll("text[class=\"ContributionCalendar-label\"]");
+    for (let i=0; i<Texts.length; i++) {
+        Texts[i].removeAttribute("class");
+        Texts[i].removeAttribute("text-anchor");
+    }
+
+
+    RawSVG.innerHTML +=
+        `<style>
+            svg {
+                background-color: #0d1117;
+                border-radius: 8px;
+                padding: 16px 20px;
+            }
+            text {
+                font-size: 12px;
+                font-weight: 400;
+                color: #e6edf3;
+                fill: #e6edf3;
+            }
+            text.title {
+                font-size: larger;
+                font-weight: 600;
+            }
+            rect[data-level="0"] {
+                fill: #161b22;
+            }
+            rect[data-level="1"] {
+                fill: #0e4429;
+            }
+            rect[data-level="2"] {
+                fill: #006d32;
+            }
+            rect[data-level="3"] {
+                fill: #26a641;
+            }
+            rect[data-level="4"] {
+                fill: #39d353;
+            }
+        </style>`
+        
+    return RawSVG;
 }
 
 function GenContributionObject (RawHTML, UserName) {
