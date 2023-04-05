@@ -5,10 +5,10 @@ import HTMLParser from "node-html-parser";
 
 
 export async function GenContributionData (UserName, Type) {
-    let SVG = await FetchUserData(UserName);
+    let UserData = await FetchUserData(UserName);
     return Type === "JSON"
-                ? JSON.stringify(GenContributionObject(SVG, UserName))
-                : SVG.toString();
+                ? JSON.stringify(GenContributionObject(UserData.RawSVG, UserName, total))
+                : UserData.RawSVG.toString();
 }
 
 /**
@@ -16,18 +16,22 @@ export async function GenContributionData (UserName, Type) {
  * @return {Object} Raw HTML
  */
 async function FetchUserData (UserName) {
-    let RawData = await fetch(`https://github.com/${UserName}`).then(res => res.text());
-    let RawSVG = HTMLParser.parse(RawData).querySelector(".js-calendar-graph-svg");
+    let RawHTML = await fetch(`https://github.com/${UserName}`)
+                            .then(res => res.text())
+                            .then(res => {return HTMLParser.parse(res)})
+    let total = RawHTML.querySelector("div.js-yearly-contributions").querySelector("h2.f4.text-normal.mb-2").innerText.split(" contribution")[0]
+    let RawSVG = HTMLParser.parse(RawHTML).querySelector(".js-calendar-graph-svg");
+    
+    RawSVG.setAttribute("height", "158")
     RawSVG.removeAttribute("class");
-    RawSVG.setAttribute("height", "142")
     RawSVG.querySelector("g").removeAttribute("data-hydro-click");
     RawSVG.querySelector("g").removeAttribute("data-hydro-click-hmac");
     RawSVG.querySelector("g").setAttribute("transform", "translate(15, 50)");
 
-    // <text class="title" dx="0" dy="16">One's GitHub Contributions Summary</text>
     let Rects = RawSVG.querySelectorAll("rect[class=\"ContributionCalendar-day\"]");
     for (let i=0; i<Rects.length; i++) {
         Rects[i].removeAttribute("class");
+        Rects[i].innerHTML = "";
     }
 
     let Texts = RawSVG.querySelectorAll("text[class=\"ContributionCalendar-label\"]");
@@ -36,7 +40,19 @@ async function FetchUserData (UserName) {
         Texts[i].removeAttribute("text-anchor");
     }
 
-
+    RawSVG.innerHTML = 
+        `<text class="title" dx="0" dy="16">${UserName}'s GitHub Contributions Summary - last year</text>` + 
+        RawSVG.innerHTML;
+    RawSVG.innerHTML += 
+        `<text class="desc" transform="translate(0, 157)" text-anchor="start">Total ${total} Contributions</text>`
+    RawSVG.innerHTML += 
+        `<g transform="translate(656, 148)">
+            <rect width="10" height="10" rx="2" ry="2" x="00" y="0" data-level="0"></rect>
+            <rect width="10" height="10" rx="2" ry="2" x="12" y="0" data-level="1"></rect>
+            <rect width="10" height="10" rx="2" ry="2" x="24" y="0" data-level="2"></rect>
+            <rect width="10" height="10" rx="2" ry="2" x="36" y="0" data-level="3"></rect>
+            <rect width="10" height="10" rx="2" ry="2" x="48" y="0" data-level="4"></rect>
+        </g>`
     RawSVG.innerHTML +=
         `<style>
             svg {
@@ -53,6 +69,9 @@ async function FetchUserData (UserName) {
             text.title {
                 font-size: larger;
                 font-weight: 600;
+            }
+            text.desc {
+                font-size: normal;
             }
             rect[data-level="0"] {
                 fill: #161b22;
@@ -71,11 +90,12 @@ async function FetchUserData (UserName) {
             }
         </style>`
         
-    return RawSVG;
+    return { RawSVG, total };
 }
 
-function GenContributionObject (RawHTML, UserName) {
+function GenContributionObject (RawHTML, UserName, total) {
     const Obj = {};
+    Obj.Total = total;
     Obj.Username = UserName;
     Obj.GenAt = new Date().toUTCString();
     Obj.Contributions = [];
