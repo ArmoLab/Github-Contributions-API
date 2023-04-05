@@ -52,7 +52,11 @@ async function FetchUserData (UserName) {
         `<text class="title" dx="0" dy="16">${UserName}'s GitHub Contributions Summary - last year</text>` + 
         RawSVG.innerHTML;
     RawSVG.innerHTML += 
-        `<text class="desc" transform="translate(0, 157)" text-anchor="start">Total ${total} Contributions</text>`
+        `<text class="desc" transform="translate(0, 157)" text-anchor="start">
+            Total ${total} Contributions | 
+            By kobe-koto/Github-Contributions-API | 
+            Gen at ${new Date().toUTCString()}
+        </text>`
     RawSVG.innerHTML += 
         `<g transform="translate(656, 148)">
             <rect width="10" height="10" rx="2" ry="2" x="00" y="0" data-level="0"></rect>
@@ -71,6 +75,7 @@ async function FetchUserData (UserName) {
             text {
                 font-size: 12px;
                 font-weight: 400;
+                font-family: sans-serif;
                 color: #e6edf3;
                 fill: #e6edf3;
             }
