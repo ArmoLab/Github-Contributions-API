@@ -27,7 +27,7 @@
 
 ### 2.2. SVG 格式
 
-可訪問如下 URL `https://<Your Project Domain>/api/get?username=<A User's ID>&type=json` 獲取 SVG 格式的數據. 下圖爲示例.
+可訪問如下 URL `https://<Your Project Domain>/api/get?username=<A User's ID>&type=svg` 獲取 SVG 格式的數據. 下圖爲示例.
 
 ![](./preview/SVG-Type.svg)
 
