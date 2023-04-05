@@ -17,7 +17,15 @@ export default async (request, response) => {
             ? await GenContributionData(UserName, Type)
             : "? what do you mean";
     
-    response.send(ContributionData);
+    response.setHeader("Content-Type",
+        Type === "JSON"
+            ? "application/json;charset=UTF-8"
+            : "image/svg+xml"
+    );
+    response.writeHead(200);
+    response.write(ContributionData);
+    response.end();
+
 }
 function GetQueryString (search, name) {
     var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");

@@ -1,9 +1,6 @@
 import fetch from "node-fetch";
 import HTMLParser from "node-html-parser";
 
-// HTMLParser.parse
-
-
 export async function GenContributionData (UserName, Type) {
     let UserData = await FetchUserData(UserName);
     return Type === "JSON"
@@ -27,10 +24,11 @@ async function FetchUserData (UserName) {
             .replace(/\n/gi,"")
             .split("contribution")[0] -1+1;
 
-    console.log(total)
     let RawSVG = HTMLParser.parse(RawHTML).querySelector(".js-calendar-graph-svg");
     
-    RawSVG.setAttribute("height", "158")
+    RawSVG.setAttribute("height", "188")
+    RawSVG.setAttribute("width", "757")
+    RawSVG.setAttribute("xmlns", "http://www.w3.org/2000/svg")
     RawSVG.removeAttribute("class");
     RawSVG.querySelector("g").removeAttribute("data-hydro-click");
     RawSVG.querySelector("g").removeAttribute("data-hydro-click-hmac");
