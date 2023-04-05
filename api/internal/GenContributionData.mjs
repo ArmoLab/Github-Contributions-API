@@ -7,7 +7,7 @@ import HTMLParser from "node-html-parser";
 export async function GenContributionData (UserName, Type) {
     let UserData = await FetchUserData(UserName);
     return Type === "JSON"
-                ? JSON.stringify(GenContributionObject(UserData.RawSVG, UserName, total))
+                ? JSON.stringify(GenContributionObject(UserData.RawSVG, UserData.total, UserName))
                 : UserData.RawSVG.toString();
 }
 
@@ -16,10 +16,18 @@ export async function GenContributionData (UserName, Type) {
  * @return {Object} Raw HTML
  */
 async function FetchUserData (UserName) {
-    let RawHTML = await fetch(`https://github.com/${UserName}`)
+    let RawHTML = await fetch(`https://github-com.husk.gq/${UserName}`)
                             .then(res => res.text())
                             .then(res => {return HTMLParser.parse(res)})
-    let total = RawHTML.querySelector("div.js-yearly-contributions").querySelector("h2.f4.text-normal.mb-2").innerText.split(" contribution")[0]
+    let total = 
+        RawHTML
+            .querySelector("div.js-yearly-contributions")
+            .querySelector("h2.f4.text-normal.mb-2")
+            .innerHTML
+            .replace(/\n/gi,"")
+            .split("contribution")[0] -1+1;
+
+    console.log(total)
     let RawSVG = HTMLParser.parse(RawHTML).querySelector(".js-calendar-graph-svg");
     
     RawSVG.setAttribute("height", "158")
@@ -31,7 +39,7 @@ async function FetchUserData (UserName) {
     let Rects = RawSVG.querySelectorAll("rect[class=\"ContributionCalendar-day\"]");
     for (let i=0; i<Rects.length; i++) {
         Rects[i].removeAttribute("class");
-        Rects[i].innerHTML = "";
+        Rects[i].innerHTML = Rects[i].innerHTML.split(" contribution")[0];
     }
 
     let Texts = RawSVG.querySelectorAll("text[class=\"ContributionCalendar-label\"]");
@@ -93,7 +101,7 @@ async function FetchUserData (UserName) {
     return { RawSVG, total };
 }
 
-function GenContributionObject (RawHTML, UserName, total) {
+function GenContributionObject (RawHTML, total, UserName) {
     const Obj = {};
     Obj.Total = total;
     Obj.Username = UserName;
@@ -101,11 +109,11 @@ function GenContributionObject (RawHTML, UserName, total) {
     Obj.Contributions = [];
     for (let i1=0; i1<RawHTML.querySelector("g").querySelectorAll("g").length; i1++) {
         Obj.Contributions[i1] = [];
-        let AWeek = RawHTML.querySelector("g").querySelectorAll("g")[i1].querySelectorAll("rect.ContributionCalendar-day");
+        let AWeek = RawHTML.querySelector("g").querySelectorAll("g")[i1].querySelectorAll("rect");
         for (let i2=0; i2<AWeek.length; i2++) {
             Obj.Contributions[i1][i2] = {};
             let ADay = Obj.Contributions[i1][i2];
-            let DayContributions = AWeek[i2].innerHTML.split(" contribution")[0];
+            let DayContributions = AWeek[i2].innerHTML;
             DayContributions = DayContributions === "No" ? 0 : DayContributions-1+1;
 
             ADay.Date = AWeek[i2].getAttribute("data-date");
