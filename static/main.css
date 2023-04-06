@@ -1,11 +1,9 @@
 body {
     margin: 0;
-    padding: 0;
+    padding: 0 50px;
     font-family: sans-serif;
     text-align: center;
 }
-
 body > main > img {
-    border-radius: 8px;
-    /*width: 757px;*/
+    max-width: 100%;
 }

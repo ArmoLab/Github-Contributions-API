@@ -1,5 +1,6 @@
 import fetch from "node-fetch";
 import HTMLParser from "node-html-parser";
+import { CreatElement } from "./CreatElement.mjs";
 
 export async function GenContributionData (UserName, Type) {
     let RawHTML = 
@@ -27,30 +28,78 @@ function GenSVG (RawHTML, UserName) {
      */
 
     // init SVG Root
-    let SVGRoot = HTMLParser.parse(`<svg height="188" width="757" xmlns="http://www.w3.org/2000/svg"></svg>`);
-    SVGRoot = SVGRoot.querySelector("svg");
+    let SVGRoot = 
+        CreatElement(
+            "svg", 
+            [
+                {name: "height", value: "200"},
+                {name: "width", value: "757"},
+                {name: "xmlns", value: "http://www.w3.org/2000/svg"}
+            ]
+        )
+
+    // bg
+    SVGRoot.appendChild(
+        CreatElement(
+            "rect", 
+            [
+                {name: "height", value: 200},
+                {name: "width", value: 757},
+                {name: "rx", value: 8},
+                {name: "ry", value: 8}
+            ]
+        )
+    );
 
     // Title
-    SVGRoot.innerHTML = `<text class="title" dx="0" dy="16">${UserData.Username}'s GitHub Contributions Summary - last year</text>`
+    SVGRoot.appendChild(
+        CreatElement(
+            "text", 
+            [
+                {name: "class", value: "title"},
+                {name: "dx", value: 20},
+                {name: "dy", value: 36}
+            ],
+            `${UserData.Username}'s GitHub Contributions Summary - last year`
+        )
+    );
 
     //init yearly root
-    SVGRoot.innerHTML += `<g class="yearly" transform="translate(15, 50)"></g>`
+    let YearlyRoot = 
+        CreatElement(
+            "g", 
+            [{name: "transform", value: "translate(35, 70)"}]
+        )
+
+    SVGRoot.appendChild(YearlyRoot);
 
     for (let i0=0; i0<Contributions.length; i0++) {
         // weekly
-        SVGRoot.querySelector("g.yearly").innerHTML += `<g transform="translate(${i0 * 14}, 0)"></g>`
-        let AWeek = SVGRoot.querySelector("g.yearly").querySelectorAll("g")[i0]
+        let WeeklyRoot = 
+            CreatElement(
+                "g",
+                [{name: "transform", value: `translate(${i0 * 14}, 0)`}]
+            )
+        YearlyRoot.appendChild(WeeklyRoot);
         for (let i1=0; i1<Contributions[i0].length; i1++) {
             // daily
-            AWeek.innerHTML += 
-                `<rect width="10" height="10" rx="2" ry="2" ` + 
-                `x="${14 - i0}" ` +
-                `y="${13 * i1}" `  +
-                `data-level="${Contributions[i0][i1].Level}"` +
-                `></rect>`
+            WeeklyRoot.appendChild(
+                CreatElement(
+                    "rect",
+                    [
+                        {name: "width", value: 10},
+                        {name: "height", value: 10},
+                        {name: "rx", value: 2},
+                        {name: "ry", value: 2},
+                        {name: "x", value: 14 - i0},
+                        {name: "y", value: 13 * i1},
+                        {name: "data-level", value: Contributions[i0][i1].Level}
+                    ]
+                )
+            )
         }
     }
-    SVGRoot.querySelector("g.yearly").innerHTML +=
+    YearlyRoot.innerHTML +=
         `<text dx="-15" dy="8" style="display: none;">Sun</text>`+
         `<text dx="-15" dy="22">Mon</text>`+
         `<text dx="-15" dy="32" style="display: none;">Tue</text>`+
@@ -62,7 +111,7 @@ function GenSVG (RawHTML, UserName) {
 
     const AsIsSVG =HTMLParser.parse(RawHTML).querySelector(".js-calendar-graph-svg")
     if (AsIsSVG.querySelectorAll("text.ContributionCalendar-label[y=\"-7\"]").length === 0) {
-        let q = AsIsAVG.querySelectorAll("text.ContributionCalendar-label[y=\"-8\"]");
+        let q = AsIsSVG.querySelectorAll("text.ContributionCalendar-label[y=\"-8\"]");
         let nums = [14, 66, 131, 183, 248, 300, 352, 417, 469, 521, 586, 638];
         for (let i=0; i<q.length; i++) {
             q[0].setAttribute("x", nums[i])
@@ -73,38 +122,18 @@ function GenSVG (RawHTML, UserName) {
     let TextX7 = AsIsSVG.querySelectorAll("text.ContributionCalendar-label[y=\"-7\"]");
     
     for (let i=0; i<TextX7.length; i++) {
-        SVGRoot.querySelector("g.yearly").innerHTML += TextX7[i].outerHTML;
+        YearlyRoot.innerHTML += TextX7[i].outerHTML;
     }
-
-    //     <text x="14" y="-7">Apr</text>
-    //     <text x="66" y="-7">May</text>
-    //     <text x="131" y="-7">Jun</text>
-    //     <text x="183" y="-7">Jul</text>
-    //     <text x="248" y="-7">Aug</text>
-    //     <text x="300" y="-7">Sep</text>
-    //     <text x="352" y="-7">Oct</text>
-    //     <text x="417" y="-7">Nov</text>
-    //     <text x="469" y="-7">Dec</text>
-    //     <text x="521" y="-7">Jan</text>
-    //     <text x="586" y="-7">Feb</text>
-    //     <text x="638" y="-7">Mar</text>
-
-
-
-
-
-
-
 
     // init infomation for GCAPI.
     SVGRoot.innerHTML += 
-        `<text class="desc" transform="translate(0, 157)" text-anchor="start">`+
+        `<text class="desc" transform="translate(20, 177)" text-anchor="start">`+
             `Total ${UserData.Total} Contributions | `+
             `By kobe-koto/Github-Contributions-API | `+
             `Gen at ${new Date().toUTCString()}`+
         `</text>`;
     SVGRoot.innerHTML += 
-        `<g transform="translate(656, 148)">`+
+        `<g transform="translate(676, 168)">`+
             `<rect width="10" height="10" rx="2" ry="2" x="00" y="0" data-level="0"></rect>`+
             `<rect width="10" height="10" rx="2" ry="2" x="12" y="0" data-level="1"></rect>`+
             `<rect width="10" height="10" rx="2" ry="2" x="24" y="0" data-level="2"></rect>`+
@@ -113,11 +142,6 @@ function GenSVG (RawHTML, UserName) {
         `</g>`;
     SVGRoot.innerHTML +=
         `<style>
-            svg {
-                background-color: #0d1117;
-                border-radius: 8px;
-                padding: 16px 20px;
-            }
             text {
                 font-size: 12px;
                 font-weight: 400;
