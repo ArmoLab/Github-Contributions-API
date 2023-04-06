@@ -29,7 +29,7 @@
 
 可訪問如下 URL `https://<Your Project Domain>/api/get?username=<A User's ID>&type=svg` 獲取 SVG 格式的數據. 下圖爲示例.
 
-![](./preview/SVG-Type.svg)
+![](https://github-contributions-api-lac.vercel.app/api/get?username=kobe-koto&type=svg)
 
 
 
