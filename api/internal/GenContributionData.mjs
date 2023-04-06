@@ -10,7 +10,7 @@ export async function GenContributionData (UserName, Type) {
     if (Type === "JSON") {
         return GenJSON(RawHTML, UserName)
     } else if (Type === "SVG") {
-        return `<svg height="188" wigth="757" xmlns="http://www.w3.org/2000/svg">${GenSVG(RawHTML, UserName).toString()}</svg>`;
+        return GenSVG(RawHTML, UserName).toString();
     }
 }
 
@@ -27,11 +27,12 @@ function GenSVG (RawHTML, UserName) {
      */
 
     // init SVG Root
-    let SVGRoot = HTMLParser.parse(`<svg height="188" wigth="757" xmlns="http://www.w3.org/2000/svg"></svg>`);
+    let SVGRoot = HTMLParser.parse(`<svg height="188" width="757" xmlns="http://www.w3.org/2000/svg"></svg>`);
+    SVGRoot = SVGRoot.querySelector("svg");
 
     // Title
     SVGRoot.innerHTML = `<text class="title" dx="0" dy="16">${UserData.Username}'s GitHub Contributions Summary - last year</text>`
-    
+
     //init yearly root
     SVGRoot.innerHTML += `<g class="yearly" transform="translate(15, 50)"></g>`
 
@@ -72,7 +73,6 @@ function GenSVG (RawHTML, UserName) {
     let TextX7 = AsIsSVG.querySelectorAll("text.ContributionCalendar-label[y=\"-7\"]");
     
     for (let i=0; i<TextX7.length; i++) {
-        console.log(TextX7[i].outerHTML)
         SVGRoot.querySelector("g.yearly").innerHTML += TextX7[i].outerHTML;
     }
 
