@@ -93,7 +93,7 @@ function GenSVG (RawHTML, UserName) {
                         {name: "ry", value: 2},
                         {name: "x", value: 14 - i0},
                         {name: "y", value: 13 * i1},
-                        {name: "data-level", value: Contributions[i0][i1].Level}
+                        {name: "class", value: "L-" + Contributions[i0][i1].Level}
                     ]
                 )
             )
@@ -134,11 +134,11 @@ function GenSVG (RawHTML, UserName) {
         `</text>`;
     SVGRoot.innerHTML += 
         `<g transform="translate(676, 168)">`+
-            `<rect width="10" height="10" rx="2" ry="2" x="00" y="0" data-level="0"></rect>`+
-            `<rect width="10" height="10" rx="2" ry="2" x="12" y="0" data-level="1"></rect>`+
-            `<rect width="10" height="10" rx="2" ry="2" x="24" y="0" data-level="2"></rect>`+
-            `<rect width="10" height="10" rx="2" ry="2" x="36" y="0" data-level="3"></rect>`+
-            `<rect width="10" height="10" rx="2" ry="2" x="48" y="0" data-level="4"></rect>`+
+            `<rect width="10" height="10" rx="2" ry="2" x="00" y="0" class="L-0"></rect>`+
+            `<rect width="10" height="10" rx="2" ry="2" x="12" y="0" class="L-1"></rect>`+
+            `<rect width="10" height="10" rx="2" ry="2" x="24" y="0" class="L-2"></rect>`+
+            `<rect width="10" height="10" rx="2" ry="2" x="36" y="0" class="L-3"></rect>`+
+            `<rect width="10" height="10" rx="2" ry="2" x="48" y="0" class="L-4"></rect>`+
         `</g>`;
     SVGRoot.innerHTML +=
         `<style>
@@ -156,19 +156,19 @@ function GenSVG (RawHTML, UserName) {
             text.desc {
                 font-size: normal;
             }
-            rect[data-level="0"] {
+            rect.L-0 {
                 fill: #161b22;
             }
-            rect[data-level="1"] {
+            rect.L-1 {
                 fill: #0e4429;
             }
-            rect[data-level="2"] {
+            rect.L-2 {
                 fill: #006d32;
             }
-            rect[data-level="3"] {
+            rect.L-3 {
                 fill: #26a641;
             }
-            rect[data-level="4"] {
+            rect.L-4 {
                 fill: #39d353;
             }
         </style>`;
