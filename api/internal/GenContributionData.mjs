@@ -93,7 +93,7 @@ function GenSVG (RawHTML, UserName) {
                         {name: "ry", value: 2},
                         {name: "x", value: 14 - i0},
                         {name: "y", value: 13 * i1},
-                        {name: "class", value: "L-" + Contributions[i0][i1].Level}
+                        {name: "class", value: "L" + Contributions[i0][i1].Level}
                     ]
                 )
             )
@@ -107,23 +107,32 @@ function GenSVG (RawHTML, UserName) {
         `<text dx="-15" dy="57" style="display: none;">Thu</text>`+
         `<text dx="-15" dy="73">Fri</text>`+
         `<text dx="-15" dy="81" style="display: none;">Sat</text>`;
-
-
-    const AsIsSVG =HTMLParser.parse(RawHTML).querySelector(".js-calendar-graph-svg")
-    if (AsIsSVG.querySelectorAll("text.ContributionCalendar-label[y=\"-7\"]").length === 0) {
-        let q = AsIsSVG.querySelectorAll("text.ContributionCalendar-label[y=\"-8\"]");
-        let nums = [14, 66, 131, 183, 248, 300, 352, 417, 469, 521, 586, 638];
-        for (let i=0; i<q.length; i++) {
-            q[0].setAttribute("x", nums[i])
-            q[0].setAttribute("y", "-7")
+        
+    let Months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    let nums = [14, 66, 131, 183, 248, 300, 352, 417, 469, 521, 586, 638];
+    for (let i=0, AddTimes = 0, LastSeenMonth = ""; i<Contributions.length && AddTimes<12; i++) {
+        let MonthNow = Contributions[i][0].Date.split("-")[1] -2+1;
+        if (LastSeenMonth !== MonthNow) {
+            YearlyRoot.appendChild(
+                CreatElement(
+                    "text",
+                    [
+                        { name: "y", value: -7 },
+                        { name: "x", value: nums[AddTimes] }
+                    ],
+                    Months[MonthNow]
+                )
+            )
+            AddTimes++;
+            LastSeenMonth = MonthNow;
         }
     }
 
-    let TextX7 = AsIsSVG.querySelectorAll("text.ContributionCalendar-label[y=\"-7\"]");
-    
-    for (let i=0; i<TextX7.length; i++) {
-        YearlyRoot.innerHTML += TextX7[i].outerHTML;
-    }
+
+
+
+
+
 
     // init infomation for GCAPI.
     SVGRoot.innerHTML += 
@@ -134,11 +143,11 @@ function GenSVG (RawHTML, UserName) {
         `</text>`;
     SVGRoot.innerHTML += 
         `<g transform="translate(676, 168)">`+
-            `<rect width="10" height="10" rx="2" ry="2" x="00" y="0" class="L-0"></rect>`+
-            `<rect width="10" height="10" rx="2" ry="2" x="12" y="0" class="L-1"></rect>`+
-            `<rect width="10" height="10" rx="2" ry="2" x="24" y="0" class="L-2"></rect>`+
-            `<rect width="10" height="10" rx="2" ry="2" x="36" y="0" class="L-3"></rect>`+
-            `<rect width="10" height="10" rx="2" ry="2" x="48" y="0" class="L-4"></rect>`+
+            `<rect width="10" height="10" rx="2" ry="2" x="00" y="0" class="L0"></rect>`+
+            `<rect width="10" height="10" rx="2" ry="2" x="12" y="0" class="L1"></rect>`+
+            `<rect width="10" height="10" rx="2" ry="2" x="24" y="0" class="L2"></rect>`+
+            `<rect width="10" height="10" rx="2" ry="2" x="36" y="0" class="L3"></rect>`+
+            `<rect width="10" height="10" rx="2" ry="2" x="48" y="0" class="L4"></rect>`+
         `</g>`;
     SVGRoot.innerHTML +=
         `<style>
@@ -156,19 +165,19 @@ function GenSVG (RawHTML, UserName) {
             text.desc {
                 font-size: normal;
             }
-            rect.L-0 {
+            rect.L0 {
                 fill: #161b22;
             }
-            rect.L-1 {
+            rect.L1 {
                 fill: #0e4429;
             }
-            rect.L-2 {
+            rect.L2 {
                 fill: #006d32;
             }
-            rect.L-3 {
+            rect.L3 {
                 fill: #26a641;
             }
-            rect.L-4 {
+            rect.L4 {
                 fill: #39d353;
             }
         </style>`;
