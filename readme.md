@@ -31,5 +31,36 @@
 
 ![](https://github-contributions-api-lac.vercel.app/api/get?username=kobe-koto&type=svg)
 
+#### 2.2.1 自訂 SVG 格式
 
+目前有下列參數可供使用
+
+- TextColor 文字的顏色
+
+- BackgroundColor 背景顏色
+
+- RectColors 各等級統計色塊的顏色
+
+  共 5 個 Hex 值(5 個等級), 請用英文逗號分割.
+
+以上提到的顏色均使用 Hex 值, 沒有開頭的 `#`.
+
+例子:
+
+```text
+https://<Your Project Domain>/api/get?
+username=<A User's ID>
+&type=svg
+&TextColor=1f1f1f
+&BackgroundColor=f8f8ff
+&RectColors=f3dee6,e3b4c5,cc7494,c0547b,b12a5b
+```
+
+返回示例:
+
+![](https://github-contributions-api-lac.vercel.app/api/get?username=kobe-koto&type=svg&TextColor=1f1f1f&BackgroundColor=f8f8ff&RectColors=f3dee6,e3b4c5,cc7494,c0547b,b12a5b)
+
+---
+
+#### 感謝您的閱讀和使用, 不介意的話請給個 Star 吧!
 

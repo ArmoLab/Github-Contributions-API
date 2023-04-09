@@ -7,8 +7,8 @@ import HTMLParser from "node-html-parser";
  */
 export function CreatElement (TagName, Attrs, Content) {
     let Target = HTMLParser.parse(`<${TagName}></${TagName}>`).querySelector(TagName);
-    for (let i=0; i<Attrs.length; i++) {
-        Target.setAttribute(Attrs[i].name, Attrs[i].value.toString());
+    for (let i in Attrs) {
+        Target.setAttribute(i, Attrs[i]);
     }
     if (Content) {
         Target.innerHTML = Content;
