@@ -1,24 +1,55 @@
 import fetch from "node-fetch";
 import HTMLParser from "node-html-parser";
 import { CreatElement } from "./CreatElement.mjs";
-
-export async function GenContributionData (UserName, Type) {
+/**
+ * 
+ * @param {String}      UserName 
+ * @param {String}      Type            "JSON"||"SVG"
+ * 
+ * @param {Object}      ColorDefine 
+ * @namespace           ColorDefine
+ * @property {String}   BackgroundColor Hex without `#`
+ * @property {Number}   RectOpacity     Opacity of Rects
+ * @property {Array}    RectColors      Color of Rects [(L0),(L1),(L2),(L3),(L4)]
+ * @returns 
+ */
+export async function GenContributionData (UserName, Type, ColorDefine) {
     let RawHTML = 
-        await fetch(`https://github.com/${UserName}`)
+        await fetch(`https://cros-cf.ooze.gq/?https://github.com/${UserName}`)
             .then(res => res.text())
             .then(res => {return HTMLParser.parse(res)})
 
     if (Type === "JSON") {
         return GenJSON(RawHTML, UserName)
     } else if (Type === "SVG") {
-        return GenSVG(RawHTML, UserName).toString();
+        console.log(ColorDefine.RectColors)
+        if (!ColorDefine.RectColors || ColorDefine.RectColors.length !== 5) {
+            ColorDefine.RectColors = [
+                "161b22",
+                "0e4429",
+                "006d32",
+                "26a641",
+                "39d353"
+            ]
+        }
+        if (ColorDefine.RectOpacity<0 || ColorDefine.RectOpacity >1) {
+            ColorDefine.RectOpacity = 1;
+        }
+        if (!ColorDefine.BackgroundColor) {
+            ColorDefine.BackgroundColor = "0d1117";
+        }
+        if (!ColorDefine.TextColor) {
+            ColorDefine.TextColor = "e6edf3";
+        }
+
+        return GenSVG(RawHTML, UserName, ColorDefine).toString();
     }
 }
 
 /**
  * @param Contributions {Array}
  */
-function GenSVG (RawHTML, UserName) {
+function GenSVG (RawHTML, UserName, ColorDefine) {
     const UserData = GenJSON(RawHTML, UserName);
     let Contributions = UserData.Contributions;
     /**
@@ -31,23 +62,24 @@ function GenSVG (RawHTML, UserName) {
     let SVGRoot = 
         CreatElement(
             "svg", 
-            [
-                {name: "height", value: "200"},
-                {name: "width", value: "757"},
-                {name: "xmlns", value: "http://www.w3.org/2000/svg"}
-            ]
+            {
+                "height": 200,
+                "width": 757,
+                "xmlns": "http://www.w3.org/2000/svg",
+            }
         )
 
     // bg
     SVGRoot.appendChild(
         CreatElement(
             "rect", 
-            [
-                {name: "height", value: 200},
-                {name: "width", value: 757},
-                {name: "rx", value: 8},
-                {name: "ry", value: 8}
-            ]
+            {
+                "height": 200,
+                "width": 757,
+                "rx": 8,
+                "rx": 8,
+                "fill": `#${ColorDefine.BackgroundColor}`,
+            }
         )
     );
 
@@ -55,11 +87,11 @@ function GenSVG (RawHTML, UserName) {
     SVGRoot.appendChild(
         CreatElement(
             "text", 
-            [
-                {name: "class", value: "title"},
-                {name: "dx", value: 20},
-                {name: "dy", value: 36}
-            ],
+            {
+                "class": "title",
+                "dx": 20,
+                "dy": 36
+            },
             `${UserData.Username}'s GitHub Contributions Summary - last year`
         )
     );
@@ -68,7 +100,7 @@ function GenSVG (RawHTML, UserName) {
     let YearlyRoot = 
         CreatElement(
             "g", 
-            [{name: "transform", value: "translate(35, 70)"}]
+            {"transform": "translate(35, 70)"}
         )
 
     SVGRoot.appendChild(YearlyRoot);
@@ -78,7 +110,7 @@ function GenSVG (RawHTML, UserName) {
         let WeeklyRoot = 
             CreatElement(
                 "g",
-                [{name: "transform", value: `translate(${i0 * 14}, 0)`}]
+                {"transform": `translate(${i0 * 14}, 0)`}
             )
         YearlyRoot.appendChild(WeeklyRoot);
         for (let i1=0; i1<Contributions[i0].length; i1++) {
@@ -86,15 +118,15 @@ function GenSVG (RawHTML, UserName) {
             WeeklyRoot.appendChild(
                 CreatElement(
                     "rect",
-                    [
-                        {name: "width", value: 10},
-                        {name: "height", value: 10},
-                        {name: "rx", value: 2},
-                        {name: "ry", value: 2},
-                        {name: "x", value: 14 - i0},
-                        {name: "y", value: 13 * i1},
-                        {name: "class", value: "L" + Contributions[i0][i1].Level}
-                    ]
+                    {
+                        "width": 10,
+                        "height": 10,
+                        "rx": 2,
+                        "ry": 2,
+                        "x": 14 - i0,
+                        "y": 13 * i1,
+                        "class": "L" + Contributions[i0][i1].Level,
+                    }
                 )
             )
         }
@@ -116,10 +148,10 @@ function GenSVG (RawHTML, UserName) {
             YearlyRoot.appendChild(
                 CreatElement(
                     "text",
-                    [
-                        { name: "y", value: -7 },
-                        { name: "x", value: nums[AddTimes] }
-                    ],
+                    {
+                        "y": -7,
+                        "x": nums[AddTimes]
+                    },
                     Months[MonthNow]
                 )
             )
@@ -127,11 +159,6 @@ function GenSVG (RawHTML, UserName) {
             LastSeenMonth = MonthNow;
         }
     }
-
-
-
-
-
 
 
     // init infomation for GCAPI.
@@ -166,21 +193,27 @@ function GenSVG (RawHTML, UserName) {
                 font-size: normal;
             }
             rect.L0 {
-                fill: #161b22;
+                fill: {{CL0}};
             }
             rect.L1 {
-                fill: #0e4429;
+                fill: {{CL1}};
             }
             rect.L2 {
-                fill: #006d32;
+                fill: {{CL2}};
             }
             rect.L3 {
-                fill: #26a641;
+                fill: {{CL3}};
             }
             rect.L4 {
-                fill: #39d353;
+                fill: {{CL4}};
             }
-        </style>`;
+        </style>`
+        .replace(/{{CL0}}/g, "#" + ColorDefine.RectColors[0])
+        .replace(/{{CL1}}/g, "#" + ColorDefine.RectColors[1])
+        .replace(/{{CL2}}/g, "#" + ColorDefine.RectColors[2])
+        .replace(/{{CL3}}/g, "#" + ColorDefine.RectColors[3])
+        .replace(/{{CL4}}/g, "#" + ColorDefine.RectColors[4])
+        .replace(/e6edf3/g, ColorDefine.TextColor)
 
     return SVGRoot;
 }

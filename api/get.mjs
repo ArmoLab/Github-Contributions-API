@@ -12,9 +12,16 @@ export default async (request, response) => {
     const Type = GetQueryString(Search, "type").toUpperCase(),
           UserName = GetQueryString(Search, "username");
 
+    const ColorDefine = {
+        BackgroundColor: GetQueryString(Search, "BackgroundColor"),
+        TextColor: GetQueryString(Search, "TextColor"),
+        RectColors: GetQueryString(Search, "RectColors").toString().replace(/%2C/gi, ",").split(","),
+        RectOpacity: GetQueryString(Search, "RectOpacity")
+    };
+
     let ContributionData = 
         (Type === "JSON" || Type === "SVG")
-            ? await GenContributionData(UserName, Type)
+            ? await GenContributionData(UserName, Type, ColorDefine)
             : "? what do you mean";
     
     response.setHeader("Content-Type",
