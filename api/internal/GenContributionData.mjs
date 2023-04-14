@@ -42,9 +42,14 @@ export async function GenContributionData (UserName, Type, ColorDefine) {
             ColorDefine.TextColor = "e6edf3";
         }
 
-        return GenSVG(RawHTML, UserName, ColorDefine).toString();
+        return GenSVG(RawHTML, UserName, ColorDefine).toString()
+            .replace(/><\/rect>/gi, "/>")
+            .replace(/\n/gi, "")
+            .replace(/\040/gi, "")
+            .replace(/;}/gi, "}");
     }
 }
+//q.replace(/\n/gi, "").replace(/\040\040\040\040/gi, "").replace(/;}/gi, "}")
 
 /**
  * @param Contributions {Array}
@@ -119,10 +124,6 @@ function GenSVG (RawHTML, UserName, ColorDefine) {
                 CreatElement(
                     "rect",
                     {
-                        "width": 10,
-                        "height": 10,
-                        "rx": 2,
-                        "ry": 2,
                         "x": 14 - i0,
                         "y": 13 * i1,
                         "class": "L" + Contributions[i0][i1].Level,
@@ -170,11 +171,11 @@ function GenSVG (RawHTML, UserName, ColorDefine) {
         `</text>`;
     SVGRoot.innerHTML += 
         `<g transform="translate(676, 168)">`+
-            `<rect width="10" height="10" rx="2" ry="2" x="00" y="0" class="L0"></rect>`+
-            `<rect width="10" height="10" rx="2" ry="2" x="12" y="0" class="L1"></rect>`+
-            `<rect width="10" height="10" rx="2" ry="2" x="24" y="0" class="L2"></rect>`+
-            `<rect width="10" height="10" rx="2" ry="2" x="36" y="0" class="L3"></rect>`+
-            `<rect width="10" height="10" rx="2" ry="2" x="48" y="0" class="L4"></rect>`+
+            `<rect x="00" y="0" class="L0"></rect>`+
+            `<rect x="12" y="0" class="L1"></rect>`+
+            `<rect x="24" y="0" class="L2"></rect>`+
+            `<rect x="36" y="0" class="L3"></rect>`+
+            `<rect x="48" y="0" class="L4"></rect>`+
         `</g>`;
     SVGRoot.innerHTML +=
         `<style>
@@ -186,11 +187,17 @@ function GenSVG (RawHTML, UserName, ColorDefine) {
                 fill: #e6edf3;
             }
             text.title {
-                font-size: larger;
+                font-size: 19px;
                 font-weight: 600;
             }
             text.desc {
                 font-size: normal;
+            }
+            g rect {
+                width: 10px;
+                height: 10px;
+                rx: 2;
+                ry: 2;
             }
             rect.L0 {
                 fill: {{CL0}};
