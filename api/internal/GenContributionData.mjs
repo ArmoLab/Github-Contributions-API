@@ -44,9 +44,6 @@ export async function GenContributionData (UserName, Type, ColorDefine) {
 
         return GenSVG(RawHTML, UserName, ColorDefine).toString()
             .replace(/><\/rect>/gi, "/>")
-            .replace(/\n/gi, "")
-            .replace(/\040/gi, "")
-            .replace(/;}/gi, "}");
     }
 }
 //q.replace(/\n/gi, "").replace(/\040\040\040\040/gi, "").replace(/;}/gi, "}")
@@ -142,7 +139,6 @@ function GenSVG (RawHTML, UserName, ColorDefine) {
         `<text dx="-15" dy="81" style="display: none;">Sat</text>`;
         
     let Months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-    let nums = [14, 66, 131, 183, 248, 300, 352, 417, 469, 521, 586, 638];
     for (let i=0, AddTimes = 0, LastSeenMonth = ""; i<Contributions.length && AddTimes<12; i++) {
         let MonthNow = Contributions[i][0].Date.split("-")[1] -2+1;
         if (LastSeenMonth !== MonthNow) {
@@ -151,7 +147,7 @@ function GenSVG (RawHTML, UserName, ColorDefine) {
                     "text",
                     {
                         "y": -7,
-                        "x": nums[AddTimes]
+                        "x": 14 + 13 * i
                     },
                     Months[MonthNow]
                 )
@@ -196,8 +192,8 @@ function GenSVG (RawHTML, UserName, ColorDefine) {
             g rect {
                 width: 10px;
                 height: 10px;
-                rx: 2;
-                ry: 2;
+                rx: 2px;
+                ry: 2px;
             }
             rect.L0 {
                 fill: {{CL0}};
@@ -221,6 +217,9 @@ function GenSVG (RawHTML, UserName, ColorDefine) {
         .replace(/{{CL3}}/g, "#" + ColorDefine.RectColors[3])
         .replace(/{{CL4}}/g, "#" + ColorDefine.RectColors[4])
         .replace(/e6edf3/g, ColorDefine.TextColor)
+        .replace(/(\n|\040\040)/gi, "")
+        .replace(/\040{/gi, "{")
+        .replace(/;}/gi, "}");
 
     return SVGRoot;
 }
