@@ -228,12 +228,14 @@ function GenJSON (RawHTML, UserName) {
 
     const Obj = {};
     Obj.Total = 
-        RawHTML
-            .querySelector("div.js-yearly-contributions")
-            .querySelector("h2.f4.text-normal.mb-2")
-            .innerHTML
-            .replace(/(\n|,)/gi,"")
-            .split("contribution")[0] -1+1;
+        parseInt(
+            RawHTML
+                .querySelector("div.js-yearly-contributions")
+                .querySelector("h2.f4.text-normal.mb-2")
+                .innerHTML
+                .replace(/(\n|,)/gi,"")
+                .split("contribution")[0]
+        );
     Obj.GenAt = new Date().toUTCString();
     Obj.Username = UserName;
     Obj.Contributions = [];
@@ -244,10 +246,10 @@ function GenJSON (RawHTML, UserName) {
             Obj.Contributions[i1][i2] = {};
             let ADay = Obj.Contributions[i1][i2];
             let DayContributions = AWeek[i2].innerHTML.split(" contribution")[0];
-            DayContributions = DayContributions === "No" ? 0 : DayContributions-1+1;
+            DayContributions = DayContributions === "No" ? 0 : parseInt(DayContributions);
 
             ADay.Date = AWeek[i2].getAttribute("data-date");
-            ADay.Level = AWeek[i2].getAttribute("data-level") -1+1;
+            ADay.Level = parseInt(AWeek[i2].getAttribute("data-level"));
             ADay.Contributions = DayContributions
         }
     }
